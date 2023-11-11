@@ -1,3 +1,5 @@
+use ieee.std_logic_1164.all ;
+use ieee.std_numeric.all ;
 use IEEE.math_real.all;
 
 entity fifo_single_clk is 
