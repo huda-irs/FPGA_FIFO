@@ -52,6 +52,52 @@ begin
 	end process;
 
 
+	-- read and write pointer
+	process(clk_i, sw_rsti, mrst_i)
+	begin
+		if(mrst_i = '0')
+			then
+			we_ptr <= 0;
+			re_ptr <= 0;
+		elsif(rising_edge(clk_i))
+			then
+			if(sw_rst_i = '1')
+				then
+				we_ptr <= 0;
+				re_ptr <= 0;
+			else
+				if(we_ptr = re_ptr and we_i = '1') -- in the case that re_i is active or inactive, we can not move the pointer beacuse this case is an "empty FIFO" case
+					then
+					if(we_ptr = G_N_SLOTS - 1)
+						then
+						we_ptr <= 0;
+					else
+						we_ptr <= we_ptr + 1;
+					end if;
+				elsif(we_ptr /= re_ptr)
+					if(we_i = '1')
+						then
+						if(we_ptr = G_N_SLOTS - 1)
+							then
+							we_ptr <= 0;
+						else
+							we_ptr <= we_ptr + 1;
+						end if;
+					end if;
+					if(re_i)
+						then
+						if(re_ptr = G_N_SLOTS - 1)
+							then
+							re_ptr <= 0;
+						else
+							re_ptr <= re_ptr + 1;
+						end if;
+					end if;
+				end if;
+			end if;
+		end if;
+	end process;
+
 	-- Map reg to I/O
 	data_o <= rdata_reg
 
